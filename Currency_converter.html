@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href="Currency_Converter.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
+</head>
+<body>
+    <form id="converter-form">
+        <h1>Currency Converter</h1>
+        <label for="amount">Amount:</label>
+        <input type="number" step="0.01" id="amount" name="amount" placeholder="Amount" required>
+        <br>
+        <label for="from-currency">From Currency:</label>
+        <select id="from-currency" name="from-currency" class="flag-select" required>
+            <option value="" disabled selected>Select a currency</option>
+            <option value="AUD" data-flag="au">AUD - Australian Dollar</option>
+            <option value="BRL" data-flag="br">BRL - Brazilian Real</option>
+            <option value="CAD" data-flag="ca">CAD - Canadian Dollar</option>
+            <option value="CHF" data-flag="ch">CHF - Swiss Franc</option>
+            <option value="CNY" data-flag="cn">CNY - Chinese Yuan</option>
+            <option value="EUR" data-flag="eu">EUR - Euro</option>
+            <option value="GBP" data-flag="gb">GBP - British Pound</option>
+            <option value="HKD" data-flag="hk">HKD - Hong Kong Dollar</option>
+            <option value="INR" data-flag="in">INR - Indian Rupee</option>
+            <option value="JPY" data-flag="jp">JPY - Japanese Yen</option>
+            <option value="KRW" data-flag="kr">KRW - South Korean Won</option>
+            <option value="MXN" data-flag="mx">MXN - Mexican Peso</option>
+            <option value="MYR" data-flag="my">MYR - Malaysian Ringgit</option>
+            <option value="NOK" data-flag="no">NOK - Norwegian Krone</option>
+            <option value="NPR" data-flag="np">NPR - Nepalese Rupee</option>
+            <option value="NZD" data-flag="nz">NZD - New Zealand Dollar</option>
+            <option value="PHP" data-flag="ph">PHP - Philippine Peso</option>
+            <option value="RUB" data-flag="ru">RUB - Russian Ruble</option>
+            <option value="SEK" data-flag="se">SEK - Swedish Krona</option>
+            <option value="SGD" data-flag="sg">SGD - Singapore Dollar</option>
+            <option value="THB" data-flag="th">THB - Thai Baht</option>
+            <option value="TRY" data-flag="tr">TRY - Turkish Lira</option>
+            <option value="USD" data-flag="us">USD - US Dollar</option>
+            <option value="ZAR" data-flag="za">ZAR - South African Rand</option>
+        </select>
+        <br>
+        <label for="to-currency">To Currency:</label>
+        <select id="to-currency" name="to-currency" class="flag-select" required>
+            <option value="" disabled selected>Select a currency</option>
+            <option value="AUD" data-flag="au">AUD - Australian Dollar</option>
+            <option value="BRL" data-flag="br">BRL - Brazilian Real</option>
+            <option value="CAD" data-flag="ca">CAD - Canadian Dollar</option>
+            <option value="CHF" data-flag="ch">CHF - Swiss Franc</option>
+            <option value="CNY" data-flag="cn">CNY - Chinese Yuan</option>
+            <option value="EUR" data-flag="eu">EUR - Euro</option>
+            <option value="GBP" data-flag="gb">GBP - British Pound</option>
+            <option value="HKD" data-flag="hk">HKD - Hong Kong Dollar</option>
+            <option value="INR" data-flag="in">INR - Indian Rupee</option>
+            <option value="JPY" data-flag="jp">JPY - Japanese Yen</option>
+            <option value="KRW" data-flag="kr">KRW - South Korean Won</option>
+            <option value="MXN" data-flag="mx">MXN - Mexican Peso</option>
+            <option value="MYR" data-flag="my">MYR - Malaysian Ringgit</option>
+            <option value="NOK" data-flag="no">NOK - Norwegian Krone</option>
+            <option value="NPR" data-flag="np">NPR - Nepalese Rupee</option>
+            <option value="NZD" data-flag="nz">NZD - New Zealand Dollar</option>
+            <option value="PHP" data-flag="ph">PHP - Philippine Peso</option>
+            <option value="RUB" data-flag="ru">RUB - Russian Ruble</option>
+            <option value="SEK" data-flag="se">SEK - Swedish Krona</option>
+            <option value="SGD" data-flag="sg">SGD - Singapore Dollar</option>
+            <option value="THB" data-flag="th">THB - Thai Baht</option>
+            <option value="TRY" data-flag="tr">TRY - Turkish Lira</option>
+            <option value="USD" data-flag="us">USD - US Dollar</option>
+            <option value="ZAR" data-flag="za">ZAR - South African Rand</option>
+        </select>
+        <br>
+        <p id="exchange-rate"></p>
+        <h2 id="result"></h2>
+        <button type="submit">Convert</button>
+        <button type="button" id="clear-button">Clear</button>
+    </form>
+
+    <script>
+        document.querySelectorAll('select.flag-select').forEach(select => {
+            select.addEventListener('change', async function () {
+                const fromCurrency = document.getElementById('from-currency').value;
+                const toCurrency = document.getElementById('to-currency').value;
+
+                if (fromCurrency && toCurrency) {
+                    const apiKey = 'ea15c760902e8aa82252ce94';
+                    const apiUrl = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/${fromCurrency}`;
+
+                    try {
+                        const response = await fetch(apiUrl);
+                        const data = await response.json();
+                        if (data.result === "success") {
+                            const conversionRate = data.conversion_rates[toCurrency];
+                            document.getElementById('exchange-rate').innerText = `1 ${fromCurrency} = ${conversionRate} ${toCurrency}`;
+                        } else {
+                            document.getElementById('exchange-rate').innerText = "Error fetching exchange rates.";
+                        }
+                    } catch (error) {
+                        document.getElementById('exchange-rate').innerText = `Error: ${error.message}`;
+                    }
+                }
+
+                const option = select.options[select.selectedIndex];
+                const flagClass = `flag-icon flag-icon-${option.getAttribute('data-flag')}`;
+                select.style.backgroundImage = `url('https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/flags/4x3/${option.getAttribute('data-flag')}.svg')`;
+            });
+        });
+
+        document.getElementById('converter-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const amount = parseFloat(document.getElementById('amount').value);
+            const fromCurrency = document.getElementById('from-currency').value;
+            const toCurrency = document.getElementById('to-currency').value;
+
+            const apiKey = 'ea15c760902e8aa82252ce94';
+            const apiUrl = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/${fromCurrency}`;
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                if (data.result === "success") {
+                    const conversionRate = data.conversion_rates[toCurrency];
+                    const convertedAmount = amount * conversionRate;
+                    document.getElementById('result').innerText = `${amount} ${fromCurrency} is equal to ${convertedAmount.toFixed(2)} ${toCurrency}`;
+                } else {
+                    document.getElementById('result').innerText = "Error fetching exchange rates.";
+                }
+            } catch (error) {
+                document.getElementById('result').innerText = `Error: ${error.message}`;
+            }
+        });
+
+        document.getElementById('clear-button').addEventListener('click', function() {
+            document.getElementById('converter-form').reset();
+            document.getElementById('result').innerText = '';
+            document.getElementById('exchange-rate').innerText = '';
+            document.querySelectorAll('select.flag-select').forEach(select => {
+                select.style.backgroundImage = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
